@@ -18,8 +18,11 @@ class CircularLayout:
                 edge_props = None,
                 **kwargs
             ):
+
+        
         if (show := ax is None):
             fig, ax = plt.subplots(**kwargs)
+            
             plt.tick_params(
                 labelbottom = False,
                 labelleft = False,
@@ -30,6 +33,7 @@ class CircularLayout:
                 right = False,
                 top = False
             )
+
         
         nodes = self.node_layout(node_data, with_labels, node_size=node_size)
         edges = self.edge_layout(nodes, edge_data, edge_width=edge_width)
@@ -39,35 +43,53 @@ class CircularLayout:
             radius = node_radius,
             offset = label_offset,
             node_props = node_props,
-            label_props = label_props)
+            label_props = label_props
+        )
         
         self.draw_edges(
             ax, edges,
             arrow_style = arrow_style,
-            edge_props = edge_props)
+            edge_props = edge_props
+        )
         
         if show:
             plt.show()
     
     
-    def plot_from_nx(self, G, label=None, group=None, size=None, width=None, **kwargs):
+    def plot_from_nx(
+                self,
+                G,
+                label = None,
+                group = None,
+                size = None,
+                width = None,
+                **kwargs
+            ):
+        
         # Create node and edge data
+        
         node_columns = dict()
+        
         if label is not None: node_columns['label'] = label
         if group is not None: node_columns['group'] = group
         if size  is not None: node_columns['size']  = size
         
         node_data = {'node': []} | { col: [] for col in node_columns.keys() }
+
         
         for n, ndata in G.nodes.items():
             node_data['node'].append(n)
+            
             for col, attr in node_columns.items():
                 node_data[col].append(ndata[attr])
         
         node_data = pl.DataFrame(node_data)
+
         
         # Edge part
+        
         edge_columns = dict()
+        
         if width is not None: edge_columns['width'] = width
         
         edge_data = {'from': [], 'to': []} | { col: [] for col in edge_columns.keys() }
@@ -75,10 +97,12 @@ class CircularLayout:
         for e, edata in G.edges.items():
             edge_data['from'].append(e[0])
             edge_data['to'].append(e[1])
+            
             for col, attr in edge_columns.items():
                 edge_data[col].append(edata[attr])
         
         edge_data = pl.DataFrame(edge_data)
+
         
         self.plot(node_data, edge_data, **kwargs)
     
